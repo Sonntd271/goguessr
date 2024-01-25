@@ -1,38 +1,18 @@
 import React, { useState } from 'react';
+import { useAuth } from './AuthContext';
 
 const App = () => {
-	const [username, setUsername] = useState('');
-	const [password, setPassword] = useState('');
-	const [guessNumber, setGuessNumber] = useState('');
-	const [token, setToken] = useState('');
-	const [authenticated, setAuthenticated] = useState(false);
+	const { token, authenticated, login, logout } = useAuth();
+	const [ username, setUsername ] = useState('');
+	const [ password, setPassword ] = useState('');
+	const [ guessNumber, setGuessNumber ] = useState('');
 
-	const handleLogin = async () => {
-		try {
-			var body = JSON.stringify({
-				username: username,
-				password: password,
-			});
-			// console.log(body);
-			const response = await fetch('http://localhost:8080/login', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: body,
-			});
+	const handleLogin = () => {
+		login(username, password);
+	};
 
-			if (!response.ok) {
-				throw new Error(`Login failed with status: ${response.status}`);
-			}
-
-			const data = await response.json();
-			setToken(data.token);
-			setAuthenticated(true);
-			console.log('Login successful. Token:', data.token);
-		} catch (error) {
-			console.error('Login failed:', error.message);
-		}
+	const handleLogout = () => {
+		logout();
 	};
 
 	const handleGuess = async () => {
@@ -111,15 +91,19 @@ const App = () => {
 								onChange={(e) => setGuessNumber(e.target.value)}
 								placeholder="1"
 							/>
-							<label htmlFor="floating-guess">
-								Guess Number
-							</label>
+							<label htmlFor="floating-guess">Guess Number</label>
 						</div>
 						<button
 							className="btn btn-primary w-100 py-2 my-2"
 							onClick={handleGuess}
 						>
 							Guess
+						</button>
+						<button
+							className="btn btn-danger w-100 py-2 my-2"
+							onClick={handleLogout}
+						>
+							Logout
 						</button>
 					</div>
 				</div>
