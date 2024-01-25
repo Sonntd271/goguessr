@@ -25,15 +25,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var loginReq LoginRequest
-	err := json.NewDecoder(r.Body).Decode(&loginReq)
+	var lr LoginRequest
+	err := json.NewDecoder(r.Body).Decode(&lr)
 	if err != nil {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 
 	// Simple authentication, subject to change
-	if loginReq.Password == "password" {
+	if lr.Password == "password" {
 		token = generateToken()
 
 		response := map[string]string{"token": token}
@@ -50,19 +50,22 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var guessReq GuessRequest
-	err := json.NewDecoder(r.Body).Decode(&guessReq)
+	var gr GuessRequest
+	err := json.NewDecoder(r.Body).Decode(&gr)
 	if err != nil {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 
-	if guessReq.Token == token {
-		if guessReq.Guess == hiddenNumber {
+	if gr.Token == token {
+		if gr.Guess == hiddenNumber {
 			hiddenNumber = generateRandomNumber()
+			w.Header().Add("Content-Type", "text/plain")
 			w.WriteHeader(http.StatusCreated)
+			w.Write([]byte("Correct!"))
 		} else {
-			http.Error(w, "Incorrect guess", http.StatusNotAcceptable)
+			w.Header().Add("Content-Type", "text/plain")
+			w.Write([]byte("Incorrect guess"))
 		}
 	} else {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -72,8 +75,16 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	hiddenNumber = generateRandomNumber()
 
-	http.HandleFunc("/login", loginHandler)
-	http.HandleFunc("/guess", guessHandler)
+	http.Handle("/", CorsMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/login":
+			loginHandler(w, r)
+		case "/guess":
+			guessHandler(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})))
 
 	fmt.Println("Server is running on: 8080")
 	http.ListenAndServe(":8080", nil)
