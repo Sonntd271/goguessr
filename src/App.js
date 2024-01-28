@@ -6,22 +6,25 @@ const App = () => {
 	const [ username, setUsername ] = useState('');
 	const [ password, setPassword ] = useState('');
 	const [ guessNumber, setGuessNumber ] = useState('');
+	const [ message, setMessage ] = useState('');
 
 	const handleLogin = () => {
+		setMessage('');
 		login(username, password);
 	};
 
 	const handleLogout = () => {
+		setMessage();
 		logout();
 	};
 
 	const handleGuess = async () => {
 		try {
-			var body = JSON.stringify({
+			let body = JSON.stringify({
 				guess: parseInt(guessNumber, 10),
 				token: token,
 			});
-			console.log(body);
+			// console.log(body);
 			const response = await fetch('http://localhost:8080/guess', {
 				method: 'POST',
 				headers: {
@@ -35,7 +38,9 @@ const App = () => {
 			}
 
 			const data = await response.text();
-			console.log('Guess successful:', data);
+			// console.log('Guess successful:', data);
+			setMessage(data);
+			setGuessNumber('');
 		} catch (error) {
 			console.error('Guess failed:', error.message);
 		}
@@ -45,7 +50,7 @@ const App = () => {
 		<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
 			{!authenticated && (
 				<div>
-					<h1 class="h3 mb-3 fw-normal">Sign in</h1>
+					<h1 className="h3 mb-3 fw-normal">Sign in</h1>
 					<div className="form-signin m-auto">
 						<div className="form-floating my-1">
 							<input
@@ -80,11 +85,11 @@ const App = () => {
 			)}
 			{authenticated && (
 				<div>
-					<h1 class="h3 mb-3 fw-normal">Guess the number!</h1>
+					<h1 className="h3 mb-3 fw-normal">Guess the number from 1-10!</h1>
 					<div className="form-signin m-auto">
 						<div className="form-floating my-1">
 							<input
-								type="text"
+								type="number"
 								className="form-control"
 								id="floating-guess"
 								value={guessNumber}
@@ -93,6 +98,7 @@ const App = () => {
 							/>
 							<label htmlFor="floating-guess">Guess Number</label>
 						</div>
+						<span className="text-primary">{message}</span>
 						<button
 							className="btn btn-primary w-100 py-2 my-2"
 							onClick={handleGuess}

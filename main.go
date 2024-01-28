@@ -62,10 +62,10 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 			hiddenNumber = generateRandomNumber()
 			w.Header().Add("Content-Type", "text/plain")
 			w.WriteHeader(http.StatusCreated)
-			w.Write([]byte("Correct!"))
+			w.Write([]byte("Correct! Generating a new number..."))
 		} else {
 			w.Header().Add("Content-Type", "text/plain")
-			w.Write([]byte("Incorrect guess"))
+			w.Write([]byte("Incorrect guess, please try again"))
 		}
 	} else {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)

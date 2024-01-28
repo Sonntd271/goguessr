@@ -1,16 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import { AuthProvider } from './AuthContext';
 
-ReactDOM.render(
-	<React.StrictMode>
-		<AuthProvider>
-			<App />
-		</AuthProvider>
-	</React.StrictMode>,
-	document.getElementById('root')
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(
+	<AuthProvider>
+		<App />
+	</AuthProvider>
 );
-
-// TODO 1: Migrate ReactDOM.render
-// TODO 2: Display Guess Feedback
