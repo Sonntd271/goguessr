@@ -5,6 +5,8 @@ import (
 )
 
 func ValidateToken(token string, ss *shared.SessionStorage) bool {
+	// ValidateToken accepts a string and records it as an entry in an in-memory storage, i.e. map
+	// Uses Mutex ReadLock for its functionality
 	ss.RLock()
 	defer ss.RUnlock()
 

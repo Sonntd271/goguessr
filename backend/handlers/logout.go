@@ -10,6 +10,8 @@ import (
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request, ss *shared.SessionStorage) {
+	// LogoutHandler receives the API token from the header and performs a validation to see if it is an existing API token
+	// If it is a valid API token, it removes the existing record, requiring the user to login again
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

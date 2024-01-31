@@ -15,6 +15,9 @@ type LoginRequest struct {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request, ss *shared.SessionStorage) {
+	// LoginHandler accepts POST requests containing a username and a password
+	// It will perform validation logic to validate the username and password
+	// If the validation passes, it will return an API token
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

@@ -16,6 +16,9 @@ type GuessRequest struct {
 }
 
 func GuessHandler(w http.ResponseWriter, r *http.Request, ss *shared.SessionStorage, ans *int) {
+	// GuessHandler only accepts POST requests containing a guess number
+	// It will strip the API token from the request header and validate it
+	// If the guess is correct, it will regenerate the hidden number
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

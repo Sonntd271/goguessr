@@ -5,6 +5,7 @@ import (
 )
 
 func CorsMiddleware(next http.Handler) http.Handler {
+	// CorsMiddleware performs access control to limit the requests that can reach the API
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodOptions {
 			w.Header().Set("Access-Control-Allow-Origin", "*")

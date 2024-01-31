@@ -7,6 +7,8 @@ import (
 )
 
 func GenerateToken() (string, error) {
+	// GenerateToken generates a random token encoded in base64 and returns it as a string
+	// Also returns an error as the second return value
 	bytes := make([]byte, 32)
 	_, err := rand.Read(bytes)
 	if err != nil {
