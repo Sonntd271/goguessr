@@ -1,10 +1,10 @@
 package api
 
 import (
-	"backend/types"
+	"backend/shared"
 )
 
-func ValidateToken(token string, ss *types.SessionStorage) bool {
+func ValidateToken(token string, ss *shared.SessionStorage) bool {
 	ss.RLock()
 	defer ss.RUnlock()
 

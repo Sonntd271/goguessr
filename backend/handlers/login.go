@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	generator "backend/api/generators"
-	"backend/types"
+	"backend/shared"
 )
 
 type LoginRequest struct {
@@ -13,7 +14,7 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request, ss *types.SessionStorage) {
+func LoginHandler(w http.ResponseWriter, r *http.Request, ss *shared.SessionStorage) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -39,6 +40,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request, ss *types.SessionStora
 
 		response := map[string]string{"token": token}
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Authorization", fmt.Sprintf("Bearer %v", token))
 		json.NewEncoder(w).Encode(response)
 	} else {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)

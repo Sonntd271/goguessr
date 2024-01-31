@@ -3,31 +3,30 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
-	"backend/types"
+	validator "backend/api/validators"
+	"backend/shared"
 )
 
-type LogoutRequest struct {
-	Token string `json:"token"`
-}
-
-func LogoutHandler(w http.ResponseWriter, r *http.Request, ss *types.SessionStorage) {
+func LogoutHandler(w http.ResponseWriter, r *http.Request, ss *shared.SessionStorage) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var lr LogoutRequest
-	err := json.NewDecoder(r.Body).Decode(&lr)
-	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+	authBearer := r.Header.Get("Authorization")
+	token := strings.TrimPrefix(authBearer, "Bearer ")
+
+	if !validator.ValidateToken(token, ss) {
+		http.Error(w, "Token not found", http.StatusBadRequest)
 		return
 	}
 
 	ss.Lock()
 	defer ss.Unlock()
 
-	ss.Sessions[lr.Token] = false
+	ss.Sessions[token] = false
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

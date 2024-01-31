@@ -4,18 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	generator "backend/api/generators"
 	validator "backend/api/validators"
-	"backend/types"
+	"backend/shared"
 )
 
 type GuessRequest struct {
-	Token string `json:"token"`
-	Guess int    `json:"guess"`
+	Guess int `json:"guess"`
 }
 
-func GuessHandler(w http.ResponseWriter, r *http.Request, ss *types.SessionStorage, ans *int) {
+func GuessHandler(w http.ResponseWriter, r *http.Request, ss *shared.SessionStorage, ans *int) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -28,7 +28,10 @@ func GuessHandler(w http.ResponseWriter, r *http.Request, ss *types.SessionStora
 		return
 	}
 
-	if !validator.ValidateToken(gr.Token, ss) {
+	authBearer := r.Header.Get("Authorization")
+	token := strings.TrimPrefix(authBearer, "Bearer ")
+
+	if !validator.ValidateToken(token, ss) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -41,11 +44,16 @@ func GuessHandler(w http.ResponseWriter, r *http.Request, ss *types.SessionStora
 		*ans = hiddenNumber
 		fmt.Println("New hidden number:", *ans)
 
-		w.Header().Add("Content-Type", "text/plain")
+		response := map[string]string{"message": "Correct! Generating a new number..."}
+
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("Correct! Generating a new number..."))
+		json.NewEncoder(w).Encode(response)
 	} else {
-		w.Header().Add("Content-Type", "text/plain")
-		w.Write([]byte("Incorrect guess, please try again"))
+		response := map[string]string{"message": "Incorrect guess, please try again"}
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
 	}
 }

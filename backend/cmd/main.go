@@ -7,11 +7,11 @@ import (
 
 	generator "backend/api/generators"
 	"backend/handlers"
-	"backend/types"
+	"backend/shared"
 )
 
 func main() {
-	sessionStorage := types.SessionStorage {
+	sessionStorage := shared.SessionStorage{
 		Sessions: make(map[string]bool),
 	}
 
