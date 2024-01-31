@@ -39,6 +39,7 @@ func GuessHandler(w http.ResponseWriter, r *http.Request, ss *shared.SessionStor
 	if gr.Guess == *ans {
 		hiddenNumber, err := generator.GenerateRandomNumber(10)
 		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		*ans = hiddenNumber
