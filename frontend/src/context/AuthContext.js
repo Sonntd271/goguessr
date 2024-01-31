@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -8,26 +9,17 @@ export const AuthProvider = ({ children }) => {
 
 	const login = async (username, password) => {
 		try {
-			const body = JSON.stringify({
+			const response = await axios.post('http://localhost:8080/login', {
 				username: username,
 				password: password,
 			});
 
-			const response = await fetch('http://localhost:8080/login', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: body,
-			});
+			const data = response.data;
 
-			if (!response.ok) {
-				throw new Error(`Login failed with status: ${response.status}`);
-			}
-
-			const data = await response.json();
 			setToken(data.token);
 			setAuthenticated(true);
+
+			axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
 		} catch (error) {
 			console.error('Login failed:', error.message);
 		}
@@ -36,6 +28,8 @@ export const AuthProvider = ({ children }) => {
 	const logout = () => {
 		setAuthenticated(false);
 		setToken('');
+
+		delete axios.defaults.headers.common['Authorization'];
 	};
 
 	return (
